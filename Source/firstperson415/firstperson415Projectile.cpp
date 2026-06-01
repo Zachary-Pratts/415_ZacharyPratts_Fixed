@@ -5,7 +5,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SphereComponent.h"
 #include "Components/DecalComponent.h"
-#include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 Afirstperson415Projectile::Afirstperson415Projectile()
 {
@@ -59,8 +61,16 @@ void Afirstperson415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 		Destroy(); //week2 - Deletes the ball completely.
 	}
 
-	if (OtherActor != nullptr) //week2 - Did it hit anything?
+	if (OtherActor != nullptr)
 	{
+		if (colorP)
+		{
+			UNiagaraComponent* particleComp = UNiagaraFunctionLibrary::SpawnSystemAttached(colorP, HitComp, NAME_None, FVector(-20.f, 0.f, 0.f), FRotator(0.f), EAttachLocation::KeepRelativeOffset, true);
+			particleComp->SetNiagaraVariableLinearColor(FString("RandomColor"), randColor);
+			ballMesh->DestroyComponent();
+			CollisionComp->BodyInstance.SetCollisionProfileName("NoCollision");
+		}
+
 		float frameNum = UKismetMathLibrary::RandomFloatInRange(0.f, 3.f); //week2 - Picks random splatter shape.
 
 		auto Decal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), baseMat, FVector(UKismetMathLibrary::RandomFloatInRange(20.f, 40.f)), Hit.Location, Hit.Normal.Rotation(), 0.f); //week2 - Spawns paint splatter Texture.
@@ -68,5 +78,8 @@ void Afirstperson415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 
 		MatInstance->SetVectorParameterValue("Color", randColor); //week2 - Paints texture random color.
 		MatInstance->SetScalarParameterValue("Frame", frameNum); //week2 - Sets random splatter shape.
+
+
+
 	}
 }
