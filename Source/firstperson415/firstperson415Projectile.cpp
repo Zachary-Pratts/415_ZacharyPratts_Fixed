@@ -8,6 +8,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include "PerlinProcTerrain.h"
 
 Afirstperson415Projectile::Afirstperson415Projectile()
 {
@@ -65,10 +66,10 @@ void Afirstperson415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 	{
 		if (colorP)
 		{
-			UNiagaraComponent* particleComp = UNiagaraFunctionLibrary::SpawnSystemAttached(colorP, HitComp, NAME_None, FVector(-20.f, 0.f, 0.f), FRotator(0.f), EAttachLocation::KeepRelativeOffset, true);
-			particleComp->SetNiagaraVariableLinearColor(FString("RandomColor"), randColor);
-			ballMesh->DestroyComponent();
-			CollisionComp->BodyInstance.SetCollisionProfileName("NoCollision");
+			UNiagaraComponent* particleComp = UNiagaraFunctionLibrary::SpawnSystemAttached(colorP, HitComp, NAME_None, FVector(-20.f, 0.f, 0.f), FRotator(0.f), EAttachLocation::KeepRelativeOffset, true); //week3 - Spawns paint splatter particles.
+			particleComp->SetNiagaraVariableLinearColor(FString("RandomColor"), randColor); //week3 - Sets particle color to match ball color.
+			ballMesh->DestroyComponent(); //week3 - Deletes the ball mesh so only splatter remains.
+			CollisionComp->BodyInstance.SetCollisionProfileName("NoCollision"); //week3 - Turns off collision so ball doesn't spawn more splatters while particles are still alive.
 		}
 
 		float frameNum = UKismetMathLibrary::RandomFloatInRange(0.f, 3.f); //week2 - Picks random splatter shape.
@@ -79,6 +80,12 @@ void Afirstperson415Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 		MatInstance->SetVectorParameterValue("Color", randColor); //week2 - Paints texture random color.
 		MatInstance->SetScalarParameterValue("Frame", frameNum); //week2 - Sets random splatter shape.
 
+		APerlinProcTerrain* procTerrain = Cast<APerlinProcTerrain>(OtherActor); //Checks if hit object is procedural terrain.
+
+		if (procTerrain) // If it is procedural terrain, alter the mesh to make a dent where the paintball hit.
+		{
+			procTerrain->AlterMesh(Hit.ImpactPoint); // Alters the terrain mesh based on the impact point.
+		}
 
 
 	}

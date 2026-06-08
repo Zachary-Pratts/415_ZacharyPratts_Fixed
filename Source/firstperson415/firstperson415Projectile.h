@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "firstperson415Projectile.generated.h"
+#include "firstperson415Projectile.generated.h" 
 
 class USphereComponent;
 class UProjectileMovementComponent;
@@ -39,7 +39,7 @@ class Afirstperson415Projectile : public AActor
 	UMaterialInstanceDynamic* dmiMat;  //week 2 - The changeable color material.
 
 	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* colorP;
+	UNiagaraSystem* colorP; //week 3 - The paint splatter particle system coloring 
 
 public:
 	Afirstperson415Projectile();
